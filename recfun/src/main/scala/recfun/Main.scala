@@ -18,9 +18,28 @@ object Main {
     else pascal(c, r - 1) + pascal(c - 1, r - 1)
 
   /**
-   * Exercise 2
-   */
-    def balance(chars: List[Char]): Boolean = ???
+    * Exercise 2
+    */
+  def balance(chars: List[Char]): Boolean = {
+
+    def score(c: Char) =
+      c match {
+        case '(' => 1
+        case ')' => -1
+        case _   => 0
+      }
+
+    def loop(cs: List[Char], open: Int): Boolean = {
+      if (open < 0)
+        false
+      else if (cs.isEmpty)
+        open == 0
+      else
+        loop(cs.tail, open + score(cs.head))
+    }
+
+    loop(chars, 0)
+  }
 
   /**
    * Exercise 3
