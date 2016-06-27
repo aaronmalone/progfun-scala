@@ -150,8 +150,7 @@ class FunSetSuite extends FunSuite {
   test("forall") {
     new TestSets {
       assert(forall(s1, odd))
-      assert(!forall(s2, odd))
-      assert(forall(s3, odd))
+      assert(!forall(s1, even))
 
       assert(forall(union(s1, s3), odd))
       assert(!forall(union(s2, s3), odd))
