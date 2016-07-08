@@ -89,13 +89,21 @@ object Huffman {
 
 
   /**
-   * Returns a list of `Leaf` nodes for a given frequency table `freqs`.
-   *
-   * The returned list should be ordered by ascending weights (i.e. the
-   * head of the list should have the smallest weight), where the weight
-   * of a leaf is the frequency of the character.
-   */
-    def makeOrderedLeafList(freqs: List[(Char, Int)]): List[Leaf] = ???
+    * Returns a list of `Leaf` nodes for a given frequency table `freqs`.
+    *
+    * The returned list should be ordered by ascending weights (i.e. the
+    * head of the list should have the smallest weight), where the weight
+    * of a leaf is the frequency of the character.
+    */
+  def makeOrderedLeafList(freqs: List[(Char, Int)]): List[Leaf] = freqs match {
+    case List() => List()
+    case head :: tail =>
+      def weighsLess(arg: (Char, Int)) = arg._2 < head._2
+      makeOrderedLeafList(tail.filter(weighsLess)) ++
+        List(Leaf(head._1, head._2)) ++
+        makeOrderedLeafList(tail.filterNot(weighsLess))
+  }
+
   
   /**
    * Checks whether the list `trees` contains only one single code tree.
