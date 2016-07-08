@@ -28,6 +28,20 @@ class HuffmanSuite extends FunSuite {
     }
   }
 
+  test("times for a single element list") {
+    assert(times(List('a')) === List(('a', 1)))
+  }
+
+  test("times for a list with two of the same characters") {
+    val list = List('a', 'a')
+    assert(times(list) === List(('a', 2)))
+  }
+
+  test("times for a larger list of characters") {
+    val result = times("cafebabe".toList)
+    assert(result === List(('c', 1), ('a', 2), ('f', 1), ('e', 2), ('b', 2)))
+  }
+
 
   test("string2chars(\"hello, world\")") {
     assert(string2Chars("hello, world") === List('h', 'e', 'l', 'l', 'o', ',', ' ', 'w', 'o', 'r', 'l', 'd'))
