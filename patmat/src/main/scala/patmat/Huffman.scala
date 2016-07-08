@@ -9,24 +9,32 @@ import common._
 object Huffman {
 
   /**
-   * A huffman code is represented by a binary tree.
-   *
-   * Every `Leaf` node of the tree represents one character of the alphabet that the tree can encode.
-   * The weight of a `Leaf` is the frequency of appearance of the character.
-   *
-   * The branches of the huffman tree, the `Fork` nodes, represent a set containing all the characters
-   * present in the leaves below it. The weight of a `Fork` node is the sum of the weights of these
-   * leaves.
-   */
-    abstract class CodeTree
+    * A huffman code is represented by a binary tree.
+    *
+    * Every `Leaf` node of the tree represents one character of the alphabet that the tree can encode.
+    * The weight of a `Leaf` is the frequency of appearance of the character.
+    *
+    * The branches of the huffman tree, the `Fork` nodes, represent a set containing all the characters
+    * present in the leaves below it. The weight of a `Fork` node is the sum of the weights of these
+    * leaves.
+    */
+  abstract class CodeTree
+
   case class Fork(left: CodeTree, right: CodeTree, chars: List[Char], weight: Int) extends CodeTree
+
   case class Leaf(char: Char, weight: Int) extends CodeTree
-  
+
 
   // Part 1: Basics
-    def weight(tree: CodeTree): Int = ??? // tree match ...
-  
-    def chars(tree: CodeTree): List[Char] = ??? // tree match ...
+  def weight(tree: CodeTree): Int = tree match {
+    case Leaf(_, w) => w
+    case Fork(_, _, _, w) => w
+  }
+
+  def chars(tree: CodeTree): List[Char] = tree match {
+    case Leaf(c, _) => List(c)
+    case Fork(_, _, cs, _) => cs
+  }
   
   def makeCodeTree(left: CodeTree, right: CodeTree) =
     Fork(left, right, chars(left) ::: chars(right), weight(left) + weight(right))
