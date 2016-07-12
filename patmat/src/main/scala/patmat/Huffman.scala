@@ -142,9 +142,9 @@ object Huffman {
    *    the example invocation. Also define the return type of the `until` function.
    *  - try to find sensible parameter names for `xxx`, `yyy` and `zzz`.
    */
-  def until(xxx: List[CodeTree] => Boolean, yyy: List[CodeTree] => List[CodeTree])(zzz: List[CodeTree]): List[CodeTree] =
-    if(xxx(zzz)) zzz
-    else until(xxx, yyy)(yyy(zzz))
+  def until(terminalCondition: List[CodeTree] => Boolean, reducer: List[CodeTree] => List[CodeTree])(startingValue: List[CodeTree]): List[CodeTree] = //TODO FIGURE OUT WHAT TO DO WITH THIS
+    if(terminalCondition(startingValue)) startingValue
+    else until(terminalCondition, reducer)(reducer(startingValue))
 
   
   /**
@@ -165,42 +165,14 @@ object Huffman {
     * the resulting list of characters.
     */
   def decode(tree: CodeTree, bits: List[Bit]): List[Char] = {
-
-    //    def select(ct: CodeTree, bs: List[Bit]): List[Char] = {
-    //      ct match {
-    //        case Leaf(c, _) => c :: decode(tree, bs)
-    //        case Fork(left, right, _, _) =>
-    //          bs.head match {
-    //            case 1 => select(left, bs.tail)
-    //            case 0 => select(right, bs.tail)
-    //          }
-    //
-    //      }
-    //      (ct, bs) match {
-    //        case (_, List()) => List()
-    //        case (Leaf(c, _), _) => c :: decode(tree, bs)
-    //        case (Fork(left, right, _,_), _) => decode(if(bs.head ))
-    //      }
-    //      if(bits.isEmpty)
-    //    }
-    //    select(tree, bits)
-
-    def chooseFork(bit: Bit, left: CodeTree, right: CodeTree) =
-      if (bit == 1) right
-      else left
+    def chooseFork(bit: Bit, left: CodeTree, right: CodeTree) = if (bit == 1) right else left
 
     def decodeImpl(ct: CodeTree, bs: List[Bit]): List[Char] =
-      /*if (bs.isEmpty) List()
-      else ct match {
-        case Leaf(c, _) => c :: decode(tree, bs)
-        case Fork(l, r, _, _) => decodeImpl(chooseFork(bs.head, l, r), bs.tail)
-      }*/
-    ct match {
-      case Leaf(c, _) => c :: decodeImpl(tree, bs)
-      case _ if bs.isEmpty => List()
-      case Fork(left, right, _, _) => decodeImpl(chooseFork(bs.head, left, right), bs.tail)
-
-    }
+      ct match {
+        case Leaf(c, _) => c :: decodeImpl(tree, bs)
+        case _ if bs.isEmpty => List()
+        case Fork(left, right, _, _) => decodeImpl(chooseFork(bs.head, left, right), bs.tail)
+      }
 
     decodeImpl(tree, bits)
   }
