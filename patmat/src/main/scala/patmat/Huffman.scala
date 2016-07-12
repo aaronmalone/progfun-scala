@@ -1,7 +1,5 @@
 package patmat
 
-import common._
-
 /**
  * Assignment 4: Huffman coding
  *
@@ -78,8 +76,8 @@ object Huffman {
    *   }
    */
   def times(chars: List[Char]): List[(Char, Int)] = {
-    def count(c: Char): Int = chars.count(_ == c)
-    def exclude(c: Char): List[Char] = chars.filter(_ != c)
+    def count(c: Char) = chars.count(_ == c)
+    def exclude(c: Char) = chars.filterNot(_ == c)
 
     chars match {
       case List() => List()
@@ -108,22 +106,25 @@ object Huffman {
   /**
    * Checks whether the list `trees` contains only one single code tree.
    */
-    def singleton(trees: List[CodeTree]): Boolean = ???
-  
+    def singleton(trees: List[CodeTree]): Boolean = trees.size == 1
+
   /**
-   * The parameter `trees` of this function is a list of code trees ordered
-   * by ascending weights.
-   *
-   * This function takes the first two elements of the list `trees` and combines
-   * them into a single `Fork` node. This node is then added back into the
-   * remaining elements of `trees` at a position such that the ordering by weights
-   * is preserved.
-   *
-   * If `trees` is a list of less than two elements, that list should be returned
-   * unchanged.
-   */
-    def combine(trees: List[CodeTree]): List[CodeTree] = ???
-  
+    * The parameter `trees` of this function is a list of code trees ordered
+    * by ascending weights.
+    *
+    * This function takes the first two elements of the list `trees` and combines
+    * them into a single `Fork` node. This node is then added back into the
+    * remaining elements of `trees` at a position such that the ordering by weights
+    * is preserved.
+    *
+    * If `trees` is a list of less than two elements, that list should be returned
+    * unchanged.
+    */
+  def combine(trees: List[CodeTree]): List[CodeTree] = trees match {
+    case first :: second :: rest => makeCodeTree(first, second) :: rest
+    case xs => xs
+  }
+
   /**
    * This function will be called in the following way:
    *
@@ -141,7 +142,10 @@ object Huffman {
    *    the example invocation. Also define the return type of the `until` function.
    *  - try to find sensible parameter names for `xxx`, `yyy` and `zzz`.
    */
-    def until(xxx: ???, yyy: ???)(zzz: ???): ??? = ???
+  def until(xxx: List[CodeTree] => Boolean, yyy: List[CodeTree] => List[CodeTree])(zzz: List[CodeTree]): List[CodeTree] =
+    if(xxx(zzz)) zzz
+    else until(xxx, yyy)(yyy(zzz))
+
   
   /**
    * This function creates a code tree which is optimal to encode the text `chars`.
@@ -149,7 +153,7 @@ object Huffman {
    * The parameter `chars` is an arbitrary text. This function extracts the character
    * frequencies from that text and creates a code tree based on them.
    */
-    def createCodeTree(chars: List[Char]): CodeTree = ???
+    def createCodeTree(chars: List[Char]): CodeTree = until(singleton, combine)(makeOrderedLeafList(times(chars))).head
   
 
   // Part 3: Decoding
@@ -157,10 +161,49 @@ object Huffman {
   type Bit = Int
 
   /**
-   * This function decodes the bit sequence `bits` using the code tree `tree` and returns
-   * the resulting list of characters.
-   */
-    def decode(tree: CodeTree, bits: List[Bit]): List[Char] = ???
+    * This function decodes the bit sequence `bits` using the code tree `tree` and returns
+    * the resulting list of characters.
+    */
+  def decode(tree: CodeTree, bits: List[Bit]): List[Char] = {
+
+    //    def select(ct: CodeTree, bs: List[Bit]): List[Char] = {
+    //      ct match {
+    //        case Leaf(c, _) => c :: decode(tree, bs)
+    //        case Fork(left, right, _, _) =>
+    //          bs.head match {
+    //            case 1 => select(left, bs.tail)
+    //            case 0 => select(right, bs.tail)
+    //          }
+    //
+    //      }
+    //      (ct, bs) match {
+    //        case (_, List()) => List()
+    //        case (Leaf(c, _), _) => c :: decode(tree, bs)
+    //        case (Fork(left, right, _,_), _) => decode(if(bs.head ))
+    //      }
+    //      if(bits.isEmpty)
+    //    }
+    //    select(tree, bits)
+
+    def chooseFork(bit: Bit, left: CodeTree, right: CodeTree) =
+      if (bit == 1) right
+      else left
+
+    def decodeImpl(ct: CodeTree, bs: List[Bit]): List[Char] =
+      /*if (bs.isEmpty) List()
+      else ct match {
+        case Leaf(c, _) => c :: decode(tree, bs)
+        case Fork(l, r, _, _) => decodeImpl(chooseFork(bs.head, l, r), bs.tail)
+      }*/
+    ct match {
+      case Leaf(c, _) => c :: decodeImpl(tree, bs)
+      case _ if bs.isEmpty => List()
+      case Fork(left, right, _, _) => decodeImpl(chooseFork(bs.head, left, right), bs.tail)
+
+    }
+
+    decodeImpl(tree, bits)
+  }
   
   /**
    * A Huffman coding tree for the French language.

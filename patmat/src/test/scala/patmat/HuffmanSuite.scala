@@ -1,10 +1,8 @@
 package patmat
 
-import org.scalatest.FunSuite
-
 import org.junit.runner.RunWith
+import org.scalatest.FunSuite
 import org.scalatest.junit.JUnitRunner
-
 import patmat.Huffman._
 
 @RunWith(classOf[JUnitRunner])
@@ -63,6 +61,10 @@ class HuffmanSuite extends FunSuite {
     new TestTrees {
       assert(decode(t1, encode(t1)("ab".toList)) === "ab".toList)
     }
+  }
+
+  test("decode a single character") {
+    assert(decode(frenchCode, List(0, 0, 0)).mkString === "s")
   }
 
 }
