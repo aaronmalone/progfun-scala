@@ -70,11 +70,7 @@ object Anagrams {
     dictionary.groupBy(wordOccurrences(_))
 
   /** Returns all the anagrams of a given word. */
-  def wordAnagrams(word: Word): List[Word] = {
-    for (
-      ana <- dictionaryByOccurrences(wordOccurrences(word)) if ana != word
-    ) yield ana
-  }
+  def wordAnagrams(word: Word): List[Word] = dictionaryByOccurrences(wordOccurrences(word))
 
   /** Returns the list of all subsets of the occurrence list.
    *  This includes the occurrence itself, i.e. `List(('k', 1), ('o', 1))`
@@ -175,5 +171,23 @@ object Anagrams {
    *
    *  Note: There is only one anagram of an empty sentence.
    */
-  def sentenceAnagrams(sentence: Sentence): List[Sentence] = ???
+  def sentenceAnagrams(sentence: Sentence): List[Sentence] = {
+
+    def impl(occurrences: Occurrences): List[Sentence] = {
+      if (occurrences.isEmpty) {
+        List(List())
+      } else {
+        for {
+          combination: Occurrences <- combinations(occurrences)
+          if dictionaryByOccurrences.contains(combination)
+          startingWord: Word <- dictionaryByOccurrences(combination)
+          subSentence: Sentence <- impl(subtract(occurrences, combination))
+        } yield {
+          startingWord :: subSentence
+        }
+      }
+    }
+
+    impl(sentenceOccurrences(sentence))
+  }
 }
